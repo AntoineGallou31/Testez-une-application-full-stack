@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
     "types": [
-      "jest"
+      "jest",
+      "node"
     ],
     "module": "commonjs",
     "emitDecoratorMetadata": true,
@@ -15,5 +16,7 @@
   "include": [
     "src/**/*.spec.ts",
     "src/**/*.d.ts"
-  ]
+  ],
+  "exclude": ["cypress.config.ts"],
+  "files": ["cypress.config.ts"]
 }
