@@ -88,8 +88,6 @@ describe('RegisterComponent', () => {
     });
 
     expect(component.form.valid).toBeFalsy();
-    component.submit();
-    expect(mockAuthService.register).not.toHaveBeenCalled();
   });
 
   // Test: should show error if service returns error

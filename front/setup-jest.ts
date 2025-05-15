@@ -1,5 +1,19 @@
 import 'jest-preset-angular/setup-jest';
 
+beforeAll(() => {
+  if (!Element.prototype.animate) {
+    Element.prototype.animate = () => ({
+      onfinish: null,
+      play: () => {},
+      pause: () => {},
+      reverse: () => {},
+      cancel: () => {},
+      finish: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }) as any;
+  }
+});
 /* global mocks for jsdom */
 const mock = () => {
   let storage: { [key: string]: string } = {};

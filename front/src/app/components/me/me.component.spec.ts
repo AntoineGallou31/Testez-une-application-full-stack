@@ -4,17 +4,15 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import {MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { SessionService } from 'src/app/services/session.service';
-
 import { MeComponent } from './me.component';
-import {User} from "../../interfaces/user.interface";
-import {UserService} from "../../services/user.service";
-import {of} from "rxjs";
-import {Router} from "@angular/router";
+import { User } from '../../interfaces/user.interface';
+import { UserService } from '../../services/user.service';
+import { of } from 'rxjs';
+import { Router } from '@angular/router';
 import { expect } from '@jest/globals';
-import {By} from "@angular/platform-browser";
-
+import { By } from '@angular/platform-browser';
 
 describe('MeComponent', () => {
   let component: MeComponent;
@@ -24,7 +22,6 @@ describe('MeComponent', () => {
   let mockUserService: jest.Mocked<UserService>;
   let mockRouter: jest.Mocked<Router>;
 
-  // Static test data that won't change between tests
   const mockUser: User = {
     id: 1,
     password: 'test1234!',
@@ -82,26 +79,22 @@ describe('MeComponent', () => {
     fixture.detectChanges();
   });
 
-  // Verify component creation
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  // Should fetch and set user data when component initializes
   it('should initialize user data on ngOnInit', () => {
     component.ngOnInit();
     expect(mockUserService.getById).toHaveBeenCalledWith('1');
     expect(component.user).toEqual(mockUser);
   });
 
-  // Should use browser history API to navigate back
   it('should navigate back when back() is called', () => {
     const historySpy = jest.spyOn(window.history, 'back');
     component.back();
     expect(historySpy).toHaveBeenCalled();
   });
 
-  // Should handle complete user deletion flow: delete account, show notification, logout and redirect
   it('should delete user and logout when delete() is called', () => {
     component.delete();
     expect(mockUserService.delete).toHaveBeenCalledWith('1');
@@ -114,28 +107,34 @@ describe('MeComponent', () => {
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
   });
 
-  // Should display user information correctly in the template
   it('should display user information correctly', () => {
-    const titleElement = fixture.debugElement.query(By.css('h1'));
-    const emailElement = fixture.debugElement.query(By.css('mat-card-content p'));
-
-    expect(titleElement.nativeElement.textContent).toContain('My Profile');
-    expect(emailElement.nativeElement.textContent).toContain(mockUser.email);
+    // Récupère tous les <p> dans le bloc utilisateur
+    const pElements = fixture.debugElement.queryAll(By.css('div[fxLayout="column"] p'));
+    expect(pElements[0].nativeElement.textContent).toContain('John DOE');
+    expect(pElements[1].nativeElement.textContent).toContain(mockUser.email);
   });
 
-  // Test view update with new user data
   it('should update view when user data is loaded', () => {
     const newUser: User = {
       ...mockUser,
       firstName: 'Jane',
       lastName: 'Smith'
     };
-
     mockUserService.getById.mockReturnValue(of(newUser));
     component.ngOnInit();
     fixture.detectChanges();
 
-    const nameElement = fixture.debugElement.query(By.css('mat-card-title'));
-    expect(nameElement.nativeElement.textContent).toContain('Jane Smith');
+    const pElements = fixture.debugElement.queryAll(By.css('div[fxLayout="column"] p'));
+    expect(pElements[0].nativeElement.textContent.replace(/\s/g, '')).toContain('JaneSMITH');
+  });
+
+  it('should show admin message if user is admin', () => {
+    const adminUser: User = { ...mockUser, admin: true };
+    mockUserService.getById.mockReturnValue(of(adminUser));
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    const adminMsg = fixture.debugElement.query(By.css('.my2'));
+    expect(adminMsg.nativeElement.textContent).toContain('You are admin');
   });
 });
