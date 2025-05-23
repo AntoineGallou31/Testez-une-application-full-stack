@@ -81,6 +81,12 @@
 			<artifactId>mapstruct-processor</artifactId>
 			<version>1.5.1.Final</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -101,6 +107,16 @@
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.5</version>
+				<configuration>
+					<excludes>
+						<exclude>com/openclassrooms/starterjwt/**/models/*.class</exclude>
+						<exclude>com/openclassrooms/starterjwt/**/*Dto.*</exclude>
+						<exclude>com/openclassrooms/starterjwt/**/*Request.*</exclude>
+						<exclude>com/openclassrooms/starterjwt/**/*Response.*</exclude>
+						<exclude>com/openclassrooms/starterjwt/**/*Exception.*</exclude>
+					</excludes>
+
+				</configuration>
 				<executions>
 					<execution>
 						<goals>
