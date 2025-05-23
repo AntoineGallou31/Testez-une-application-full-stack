@@ -9,12 +9,18 @@ import { SessionApiService } from '../../services/session-api.service';
 import { ListComponent } from './list.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Session } from '../../interfaces/session.interface';
+import {By} from "@angular/platform-browser";
+import { DetailComponent } from '../detail/detail.component';
+import {Router} from "@angular/router";
+import { Location } from '@angular/common';
 
 describe('ListComponent', () => {
   let component: ListComponent;
   let fixture: ComponentFixture<ListComponent>;
   let mockSessionService: any;
   let mockSessionApiService: any;
+  let router: Router;
+  let location: Location;
 
   const mockSessions = [
     {
@@ -53,28 +59,88 @@ describe('ListComponent', () => {
     mockSessionApiService = { all: jest.fn().mockReturnValue(sessionsSubject) };
 
     await TestBed.configureTestingModule({
-      declarations: [ListComponent],
-      imports: [HttpClientModule, MatCardModule, MatIconModule, RouterTestingModule],
+      declarations: [ListComponent, DetailComponent],
+      imports: [
+        RouterTestingModule.withRoutes([
+          { path: 'detail/:id', component: DetailComponent }
+        ]),
+        HttpClientModule,
+        MatCardModule,
+        MatIconModule
+      ],
       providers: [
         { provide: SessionService, useValue: mockSessionService },
         { provide: SessionApiService, useValue: mockSessionApiService }
       ]
     }).compileComponents();
 
+    router = TestBed.inject(Router);
+    location = TestBed.inject(Location);
+
     fixture = TestBed.createComponent(ListComponent);
     component = fixture.componentInstance;
-    //component.sessions$ = new BehaviorSubject<Session[]>(mockSessions);
     fixture.detectChanges();
+    router.initialNavigation();
+
   });
 
+  // (Unit Test) Verify component creation
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should receive and store sessions from the service', (done) => {
-    component.sessions$.subscribe(sessions => {
-      expect(sessions).toEqual(mockSessions);
-      done();
+  // (Unit Test) Verify that session information is fetched and displayed correctly
+  it('should fetch and display session information correctly', () => {
+    // Verify that the service is called
+    expect(mockSessionApiService.all).toHaveBeenCalled();
+
+    // When
+    // Verify that the sessions are displayed
+    fixture.detectChanges();
+
+    // Then
+    const sessionElements = fixture.debugElement.queryAll(By.css('.item'));
+    expect(sessionElements.length).toBe(mockSessions.length);
+
+    // Verify the content of a session
+    const firstSession = sessionElements[0].nativeElement;
+    expect(firstSession.textContent).toContain(mockSessions[0].name);
+    expect(firstSession.textContent).toContain('Session on');
+  });
+
+// (Unit Test) Verify that "Create" and "Detail" buttons appear if the user is admin
+  it('should display "Create" and "Detail" buttons if the user is admin', () => {
+    // Verify that the user is admin
+    expect(component.user?.admin).toBe(true);
+
+    // When
+    fixture.detectChanges();
+
+    // Then
+    // Verify that the "Create" button is present
+    const createButton = fixture.debugElement.query(By.css('button[routerLink="create"]'));
+    expect(createButton).toBeTruthy();
+    expect(createButton.nativeElement.textContent).toContain('Create');
+
+    // Verify that the "Detail" button is present for each session
+    const detailButtons = fixture.debugElement.queryAll(By.css('.detail-button'));
+    expect(detailButtons.length).toBe(mockSessions.length);
+    detailButtons.forEach((button, index) => {
+      expect(button.nativeElement.textContent).toContain('Detail');
     });
+  });
+
+  it('should navigate to the detail component when clicking on the "Detail" button', async () => {
+    // When
+    fixture.detectChanges();
+
+    // Then
+    const detailButton = fixture.debugElement.query(By.css('.detail-button'));
+    expect(detailButton).toBeTruthy();
+
+    detailButton.nativeElement.click();
+    await fixture.whenStable();
+
+    expect(location.path()).toBe('/detail/1');
   });
 });

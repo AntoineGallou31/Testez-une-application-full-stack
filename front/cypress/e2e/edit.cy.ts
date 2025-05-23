@@ -1,0 +1,158 @@
+// Modification session
+// ● La session est modifiée
+// ● L’affichage d’erreur en l’absence d’un champ
+// obligatoire
+
+/// <reference types="cypress" />
+
+describe ('Edit Component spec', () => {
+
+  beforeEach(() => {
+
+    cy.visit('/login');
+
+    cy.intercept('POST', '/api/auth/login', {
+      body: {
+        id: 1,
+        username: 'yoga@studio.com',
+        firstName: 'FirstName',
+        lastName: 'LastName',
+        admin: true,
+      },
+    }).as('loginRequest');
+
+    cy.intercept('GET', '/api/session', {
+      body: [
+        {
+          id: 1,
+          name: 'Yoga Session',
+          description: 'A relaxing yoga session',
+          date: '2023-12-08T13:53:05',
+          teacher_id: 1,
+          users: [2],
+          createdAt: "2025-05-02T10:37:30",
+          updatedAt: "2025-05-02T10:37:30"
+        }
+      ]
+    }).as('sessionsRequest');
+
+    cy.intercept(
+      {
+        method: 'GET',
+        url: '/api/user/1',
+      },
+      {
+        id: 1,
+        email: 'yoga@studio.com',
+        lastName: 'Mar',
+        firstName: 'Ishta',
+        admin: true,
+        createdAt: '2023-10-12T15:49:37',
+        updatedAt: '2023-12-08T13:53:05',
+      }
+    ).as('me-details');
+
+    cy.get('input[formControlName=email]').type('yoga@studio.com');
+    cy.get('input[formControlName=password]').type('test!1234');
+    cy.get('button[type=submit]').click();
+
+    cy.intercept('GET', '/api/teacher', {
+      body: [
+        {
+          id: 1,
+          lastName: "DELAHAYE",
+          firstName: "Margot",
+          createdAt: "2025-05-02T09:43:06",
+          updatedAt: "2025-05-02T09:43:06"
+        },
+        {
+          id: 2,
+          lastName: "THIERCELIN",
+          firstName: "Hélène",
+          createdAt: "2025-05-02T09:43:06",
+          updatedAt: "2025-05-02T09:43:06"
+        }
+      ]
+    }).as('teachersList');
+
+    cy.intercept(
+      {
+        method: 'GET',
+        url: '/api/session/1',
+      },
+      {
+        id: 1,
+        name: 'Yoga Session',
+        description: 'A relaxing yoga session',
+        date: '2023-12-08T13:53:05',
+        teacher_id: 1,
+        users: [2],
+        createdAt: "2025-05-02T10:37:30",
+        updatedAt: "2025-05-02T10:37:30",
+      }
+    ).as('session-details');
+
+    cy.get('button.edit-button').click();
+
+  });
+
+  it('should update the session when fields are modified and saved', () => {
+    // Intercepter la requête PUT pour la mise à jour de la session
+    cy.intercept('PUT', '/api/session/1', {
+      statusCode: 200,
+      body: {
+        id: 1,
+        name: 'Yoga Session Modifié',
+        description: 'Description modifiée',
+        date: '2023-12-20',
+        teacher_id: 2,
+        users: [2],
+        createdAt: "2025-05-02T10:37:30",
+        updatedAt: "2025-05-02T10:38:30",
+      }
+    }).as('updateSession');
+
+    // Intercepter la requête GET après redirection
+    cy.intercept('GET', '/api/session', {
+      body: [
+        {
+          id: 1,
+          name: 'Yoga Session Modifié',
+          description: 'Description modifiée',
+          date: '2023-12-20',
+          teacher_id: 2,
+          users: [2],
+          createdAt: "2025-05-02T10:37:30",
+          updatedAt: "2025-05-02T10:38:30"
+        }
+      ]
+    }).as('updatedSessionsList');
+
+    // Modifier les champs du formulaire
+    cy.get('input[formControlName=name]').clear().type('Yoga Session Modifié');
+    cy.get('textarea[formControlName=description]').clear().type('Description modifiée');
+    cy.get('input[formControlName=date]').clear().type('2023-12-20');
+
+    // Changer le teacher
+    cy.get('mat-select[formControlName=teacher_id]').click();
+    cy.get('mat-option').contains('Hélène THIERCELIN').click();
+
+    // Soumettre le formulaire
+    cy.get('button[type=submit]').click();
+
+    // Vérifier que la requête de mise à jour a été effectuée
+    cy.wait('@updateSession');
+
+    // Vérifier la redirection vers la page des sessions
+    cy.url().should('include', '/sessions');
+
+    // Vérifier que la session mise à jour apparaît dans la liste
+    cy.contains('Yoga Session Modifié').should('be.visible');
+  });
+
+  it('should display error when required field is missing', () => {
+        cy.get('input[formControlName=name]').clear();
+
+        cy.get('button[type=submit]').should('be.disabled');
+  });
+});

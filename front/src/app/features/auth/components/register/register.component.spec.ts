@@ -51,13 +51,14 @@ describe('RegisterComponent', () => {
     fixture.detectChanges();
   });
 
-  // Test: should create the component
+// (Unit Test) Verify component creation
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  // Test: should create account and redirect to /login
+  // (Unit Test) Verify account creation and navigation logic
   it('should create account and redirect to /login', () => {
+    // Given
     mockAuthService.register.mockReturnValue(of(void 0));
     component.form.setValue({
       email: 'test@test.com',
@@ -66,8 +67,10 @@ describe('RegisterComponent', () => {
       password: 'password123'
     });
 
+    // When
     component.submit();
 
+    // Then
     expect(mockAuthService.register).toHaveBeenCalledWith({
       email: 'test@test.com',
       firstName: 'John',
@@ -78,8 +81,9 @@ describe('RegisterComponent', () => {
     expect(component.onError).toBeFalsy();
   });
 
-  // Test: should show error if a required field is missing
+  // (Unit Test) Verify form validation logic
   it('should show error if a required field is missing', () => {
+    // Given
     component.form.setValue({
       email: 'test@test.com',
       firstName: 'John',
@@ -87,12 +91,14 @@ describe('RegisterComponent', () => {
       password: ''
     });
 
+    // Then
     expect(component.form.valid).toBeFalsy();
   });
 
-  // Test: should show error if service returns error
+  // (Unit Test) Verify error handling logic
   it('should show error if service returns error', () => {
     mockAuthService.register.mockReturnValue(throwError(() => new Error('Error')));
+    // Given
     component.form.setValue({
       email: 'test@test.com',
       firstName: 'John',
@@ -100,8 +106,10 @@ describe('RegisterComponent', () => {
       password: 'password123'
     });
 
+    // When
     component.submit();
 
+    // Then
     expect(component.onError).toBeTruthy();
   });
 });

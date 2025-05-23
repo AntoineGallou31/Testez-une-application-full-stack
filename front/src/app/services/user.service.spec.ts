@@ -23,11 +23,14 @@ describe('UserService', () => {
     httpMock.verify();
   });
 
+  // (Unit Test) Verify service creation
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
+  // (Unit Test) Test HTTP GET request for user retrieval
   it('should call GET with correct URL in getById', () => {
+    // Given
     const mockUser: User = {
       id: 1,
       password: 'test1234!',
@@ -38,18 +41,27 @@ describe('UserService', () => {
       createdAt: new Date(),
       updatedAt: new Date()
     };
+
+    // When
     service.getById('1').subscribe(user => {
       expect(user).toEqual(mockUser);
     });
+
+    // Then
     const req = httpMock.expectOne('api/user/1');
     expect(req.request.method).toBe('GET');
     req.flush(mockUser);
   });
 
+  // (Unit Test) Test HTTP DELETE request for user deletion
   it('should call DELETE with correct URL in delete', () => {
+
+    // When
     service.delete('2').subscribe(response => {
       expect(response).toBeTruthy();
     });
+
+    // Then
     const req = httpMock.expectOne('api/user/2');
     expect(req.request.method).toBe('DELETE');
     req.flush({ success: true });

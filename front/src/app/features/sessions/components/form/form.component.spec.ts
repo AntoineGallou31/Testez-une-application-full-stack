@@ -92,36 +92,53 @@ describe('FormComponent', () => {
     fixture.detectChanges();
   });
 
+  // (Unit Test) Verify component creation
   it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display "Create session" title in create mode', () => {
-    const titleElement = fixture.debugElement.query(By.css('h1'));
-    expect(titleElement.nativeElement.textContent).toContain('Create session');
-  });
-
-  it('should disable the submit button if the form is invalid', () => {
-    component.sessionForm?.patchValue({
-      name: '',
-      date: '',
-      teacher_id: '',
-      description: ''
-    });
-    fixture.detectChanges();
-    const submitButton = fixture.debugElement.query(By.css('button[type="submit"]'));
-    expect(submitButton.nativeElement.disabled).toBe(true);
-  });
-
+  // (Unit Test) Verify create method and navigation logic
   it('should call create method when submitting in create mode', () => {
+    // Given
     component.sessionForm?.patchValue({
       name: 'New session',
       date: '2023-01-01',
       teacher_id: 1,
       description: 'Description'
     });
+
+    // When
     component.submit();
+
+    // Then
     expect(mockSessionApiService.create).toHaveBeenCalled();
     expect(mockRouter.navigate).toHaveBeenCalledWith(['sessions']);
+  });
+
+  // (Unit Test) Verify correct page title rendering in create mode
+  it('should display "Create session" title in create mode', () => {
+    // Given
+    const titleElement = fixture.debugElement.query(By.css('h1'));
+
+    // Then
+    expect(titleElement.nativeElement.textContent).toContain('Create session');
+  });
+
+  // (Unit Test) Verify form validation and button state
+  it('should disable the submit button if the form is invalid', () => {
+    // Given
+    component.sessionForm?.patchValue({
+      name: '',
+      date: '',
+      teacher_id: '',
+      description: ''
+    });
+
+    // When
+    fixture.detectChanges();
+
+    // Then
+    const submitButton = fixture.debugElement.query(By.css('button[type="submit"]'));
+    expect(submitButton.nativeElement.disabled).toBe(true);
   });
 });

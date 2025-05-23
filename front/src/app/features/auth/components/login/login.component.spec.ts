@@ -59,12 +59,14 @@ describe('LoginComponent', () => {
     fixture.detectChanges();
   });
 
+  // (Unit Test) Verify component creation
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-   //Test successful login submission
+// (Unit Test) Verify successful login submission logic
   it('should handle successful login submission', () => {
+    // Given
     const sessionInfo = {
       token: 'fake-token',
       type: 'Bearer',
@@ -82,8 +84,10 @@ describe('LoginComponent', () => {
       password: 'password123'
     });
 
+    // When
     component.submit();
 
+    // Then
     expect(mockAuthService.login).toHaveBeenCalledWith({
       email: 'john@test.com',
       password: 'password123'
@@ -94,8 +98,9 @@ describe('LoginComponent', () => {
   });
 
 
-   // Test integration of login form submission with session service
+// (Unit Test) Test form submission with error handling in the UI
   it('should integrate form submission with error handling', async () => {
+    // Given
     // Simulate authentication error
     mockAuthService.login.mockReturnValue(throwError(() => new Error('Auth failed')));
 
@@ -112,10 +117,12 @@ describe('LoginComponent', () => {
 
     fixture.detectChanges();
 
+    //When
     // Submit the form
     form.triggerEventHandler('submit', null);
     fixture.detectChanges();
 
+    //Then
     // Check error message display
     expect(component.onError).toBeTruthy();
     const errorMessage = fixture.debugElement.query(By.css('.error'));

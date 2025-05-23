@@ -46,16 +46,23 @@ describe('AppComponent', () => {
     expect(component).toBeTruthy();
   });
   it('should return an observable of boolean from $isLogged()', () => {
+
+    // When
     const isLogged = component.$isLogged();
+
+    // Then
     expect(isLogged).toBeInstanceOf(Observable);
   });
 
   it('should call sessionService.logOut() and navigate to "/" on logout()', () => {
+    // Given
     const logOutSpy = jest.spyOn(sessionService, 'logOut');
     const navigateSpy = jest.spyOn(router, 'navigate');
 
+    // When
     component.logout();
 
+    // Then
     expect(logOutSpy).toHaveBeenCalled();
     expect(navigateSpy).toHaveBeenCalledWith(['']);
   });

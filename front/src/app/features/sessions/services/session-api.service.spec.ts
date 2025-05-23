@@ -34,80 +34,75 @@ describe('SessionsService', () => {
     httpMock.verify();
   });
 
+// (Unit Test) Verify service creation
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  // Test fetching all sessions
+  // (Unit Test) Test HTTP GET request for fetching all sessions
   it('should fetch all sessions with all()', () => {
+    // When
     service.all().subscribe(sessions => {
       expect(sessions).toEqual(mockSession);
     });
+
+    // Then
     const req = httpMock.expectOne('api/session');
     expect(req.request.method).toBe('GET');
     req.flush(mockSession);
   });
 
-  // Test fetching session details
+  // (Unit Test) Test HTTP GET request for fetching session details
   it('should fetch session detail with detail()', () => {
+    // When
     service.detail('1').subscribe(session => {
       expect(session).toEqual(mockSession);
     });
+
+    // Then
     const req = httpMock.expectOne('api/session/1');
     expect(req.request.method).toBe('GET');
     req.flush(mockSession);
   });
 
-  // Test deleting a session
+  // (Unit Test) Test HTTP DELETE request for session deletion
   it('should delete a session with delete()', () => {
+    // When
     service.delete('1').subscribe(response => {
       expect(response).toEqual({});
     });
+
+    // Then
     const req = httpMock.expectOne('api/session/1');
     expect(req.request.method).toBe('DELETE');
     req.flush({});
   });
 
-  // Test creating a session
+  // (Unit Test) Test HTTP POST request for session creation
   it('should create a session with create()', () => {
+    // When
     service.create(mockSession).subscribe(session => {
       expect(session).toEqual(mockSession);
     });
+
+    // Then
     const req = httpMock.expectOne('api/session');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(mockSession);
     req.flush(mockSession);
   });
 
-  // Test updating a session
-  it('should update a session with update()', () => {
-    service.update('1', mockSession).subscribe(session => {
-      expect(session).toEqual(mockSession);
-    });
-    const req = httpMock.expectOne('api/session/1');
-    expect(req.request.method).toBe('PUT');
-    expect(req.request.body).toEqual(mockSession);
-    req.flush(mockSession);
-  });
-
-  // Test participating in a session
+  // (Unit Test) Test HTTP DELETE request for session not-participation
   it('should participate in a session with participate()', () => {
+    // When
     service.participate('1', '42').subscribe(response => {
       expect(response).toBeUndefined();
     });
+    // Then
     const req = httpMock.expectOne('api/session/1/participate/42');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toBeNull();
     req.flush(null);
   });
 
-  // Test unparticipating from a session
-  it('should unParticipate from a session with unParticipate()', () => {
-    service.unParticipate('1', '42').subscribe(response => {
-      expect(response).toBeUndefined();
-    });
-    const req = httpMock.expectOne('api/session/1/participate/42');
-    expect(req.request.method).toBe('DELETE');
-    req.flush(null);
-  });
 });

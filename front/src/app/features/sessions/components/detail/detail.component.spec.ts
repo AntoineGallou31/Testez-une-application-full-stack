@@ -12,7 +12,7 @@ import { TeacherService } from '../../../../services/teacher.service';
 import { DetailComponent } from './detail.component';
 import { expect } from '@jest/globals';
 import { MatIconModule } from "@angular/material/icon";
-import { MatCardContent, MatCardModule, MatCardTitle } from "@angular/material/card";
+import { MatCardModule } from "@angular/material/card";
 
 describe('DetailComponent', () => {
   let component: DetailComponent;
@@ -88,12 +88,15 @@ describe('DetailComponent', () => {
     fixture.detectChanges();
   };
 
+  // (Unit Test) Verify component creation
   it('should create', async () => {
     await setupAdminTest();
     expect(component).toBeTruthy();
   });
 
+  // (Unit Test) Verify data fetching and display rendering
   it('should fetch and display session information correctly', async () => {
+    // Given
     await setupAdminTest();
 
     // Verify API calls
@@ -104,8 +107,11 @@ describe('DetailComponent', () => {
     expect(component.session).toEqual(mockSession);
     expect(component.teacher).toEqual(mockTeacher);
 
+    /// When
     // Verify information display
     fixture.detectChanges();
+
+    // Then
     const sessionNameElement = fixture.debugElement.query(By.css('h1'));
     expect(sessionNameElement.nativeElement.textContent).toContain(mockSession.name);
 
@@ -114,14 +120,28 @@ describe('DetailComponent', () => {
     expect(componentText).toContain(mockTeacher.lastName.toUpperCase());
   });
 
-  it('should show delete button if user is admin', async () => {
+  // (Unit Test) Verify that the "Delete" button is displayed for an admin user
+  it('should display the delete button if the user is admin', async () => {
+    // Given
     await setupAdminTest();
-    fixture.detectChanges();
 
-    // Find delete button
+    // When
+    // Verify that the "Delete" button is present
     const deleteButton = fixture.debugElement.query(By.css('button[color="warn"]'));
-
     expect(deleteButton).toBeTruthy();
     expect(deleteButton.nativeElement.textContent).toContain('Delete');
   });
+
+  // (Unit Test) Test navigation functionality
+  it('should navigate back when back() is called', () => {
+    // Given
+    const historySpy = jest.spyOn(window.history, 'back');
+
+    // When
+    component.back();
+
+    // Then
+    expect(historySpy).toHaveBeenCalled();
+  });
+
 });
