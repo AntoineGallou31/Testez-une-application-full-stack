@@ -23,24 +23,41 @@ public class TeacherControllerTest {
     @Test
     @WithMockUser(username = "test@example.com") // Simulate logged in user
     public void testFindById_ExistingTeacher() throws Exception {
-        mockMvc.perform(get("/api/teacher/1"))
+        // Given
+        Long teacherId = 1L;
+
+        // When
+        mockMvc.perform(get("/api/teacher/" + teacherId))
+
+        // Then
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.id").value(teacherId))
                 .andExpect(jsonPath("$.firstName").value("Teacher One"));
     }
 
     @Test
     @WithMockUser(username = "test@example.com") // Simulate logged in user
     public void testFindById_NonExistingTeacher() throws Exception {
-        mockMvc.perform(get("/api/teacher/3"))
+        // Given
+        Long nonExistingTeacherId = 3L;
+
+        // When
+        mockMvc.perform(get("/api/teacher/" + nonExistingTeacherId))
+
+        // Then
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @WithMockUser(username = "test@example.com") // Simulate logged in user
     public void testFindAll() throws Exception {
+        // Given
+
+        // When
         mockMvc.perform(get("/api/teacher"))
+
+        // Then
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id").value(1))

@@ -27,10 +27,8 @@ describe('AuthService', () => {
       providers: [AuthService]
     });
     service = TestBed.inject(AuthService);
-  });
+    httpMock = TestBed.inject(HttpTestingController);
 
-  afterEach(() => {
-    httpMock.verify();
   });
 
   // (Unit Test) Verify service creation

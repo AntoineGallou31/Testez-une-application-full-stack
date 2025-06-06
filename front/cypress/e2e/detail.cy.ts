@@ -87,7 +87,6 @@ cy.intercept(
   });
 
   it('should show session infos correctly', () => {
-    // Then
     cy.get('div.description').should('contain', 'A relaxing yoga session');
     cy.get('h1').should('contain', 'Yoga Session');
 
@@ -108,7 +107,7 @@ cy.intercept(
     cy.wait('@deleteSession');
 
     cy.intercept('GET', '/api/session', {
-      body: []  // liste vide après suppression
+      body: []
     }).as('sessionsAfterDelete');
 
     cy.url().should('include', '/sessions');

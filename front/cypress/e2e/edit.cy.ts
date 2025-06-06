@@ -1,8 +1,3 @@
-// Modification session
-// ● La session est modifiée
-// ● L’affichage d’erreur en l’absence d’un champ
-// obligatoire
-
 /// <reference types="cypress" />
 
 describe ('Edit Component spec', () => {
@@ -97,7 +92,6 @@ describe ('Edit Component spec', () => {
   });
 
   it('should update the session when fields are modified and saved', () => {
-    // Intercepter la requête PUT pour la mise à jour de la session
     cy.intercept('PUT', '/api/session/1', {
       statusCode: 200,
       body: {
@@ -112,7 +106,6 @@ describe ('Edit Component spec', () => {
       }
     }).as('updateSession');
 
-    // Intercepter la requête GET après redirection
     cy.intercept('GET', '/api/session', {
       body: [
         {
@@ -128,25 +121,19 @@ describe ('Edit Component spec', () => {
       ]
     }).as('updatedSessionsList');
 
-    // Modifier les champs du formulaire
     cy.get('input[formControlName=name]').clear().type('Yoga Session Modifié');
     cy.get('textarea[formControlName=description]').clear().type('Description modifiée');
     cy.get('input[formControlName=date]').clear().type('2023-12-20');
 
-    // Changer le teacher
     cy.get('mat-select[formControlName=teacher_id]').click();
     cy.get('mat-option').contains('Hélène THIERCELIN').click();
 
-    // Soumettre le formulaire
     cy.get('button[type=submit]').click();
 
-    // Vérifier que la requête de mise à jour a été effectuée
     cy.wait('@updateSession');
 
-    // Vérifier la redirection vers la page des sessions
     cy.url().should('include', '/sessions');
 
-    // Vérifier que la session mise à jour apparaît dans la liste
     cy.contains('Yoga Session Modifié').should('be.visible');
   });
 

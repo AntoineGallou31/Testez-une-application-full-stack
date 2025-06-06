@@ -24,33 +24,55 @@ public class UserControllerTest {
     @Test
     @WithMockUser(username = "test@example.com") // Simulate logged in user
     public void testFindById_ExistingUser() throws Exception {
+        // Given
+        Long userId = 1L;
 
-        mockMvc.perform(get("/api/user/1"))
+        // When
+        mockMvc.perform(get("/api/user/" + userId))
+
+        // Then
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.id").value(userId))
                 .andExpect(jsonPath("$.email").value("admin@example.com"));
     }
 
     @Test
     @WithMockUser(username = "test@example.com") // Simulate logged in user
     public void testFindById_NonExistingUser() throws Exception {
-        mockMvc.perform(get("/api/user/3"))
+        // Given
+        Long nonExistingUserId = 3L;
+
+        // When
+        mockMvc.perform(get("/api/user/" + nonExistingUserId))
+
+        // Then
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @WithMockUser(username = "test@example.com") // Simulate logged in user
     public void testDeleteUser_Authorized() throws Exception {
-        mockMvc.perform(delete("/api/user/2"))
+        // Given
+        Long userId = 2L;
+
+        // When
+        mockMvc.perform(delete("/api/user/" + userId))
+
+        // Then
                 .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(username = "other@example.com") // Simulate different logged in user
     public void testDeleteUser_Unauthorized() throws Exception {
-        mockMvc.perform(delete("/api/user/1"))
+        // Given
+        Long userId = 1L;
+
+        // When
+        mockMvc.perform(delete("/api/user/" + userId))
+
+        // Then
                 .andExpect(status().isUnauthorized());
     }
-
 }

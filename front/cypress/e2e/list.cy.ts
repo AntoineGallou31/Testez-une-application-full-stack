@@ -1,6 +1,3 @@
-// ● Affichage de la liste des sessions
-// ● L’apparition des boutons Create et Detail si
-// l’utilisateur connecté est un admin
 /// <reference types="cypress" />
 
 describe ('Session List', () => {

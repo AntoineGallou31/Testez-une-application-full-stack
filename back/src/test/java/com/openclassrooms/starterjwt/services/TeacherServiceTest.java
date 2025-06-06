@@ -30,6 +30,7 @@ public class TeacherServiceTest {
 
     @Test
     public void testFindAllTeachers() {
+        // Given
         List<Teacher> teachers = new ArrayList<>();
         Teacher teacher1 = new Teacher();
         teacher1.setFirstName("John");
@@ -44,16 +45,18 @@ public class TeacherServiceTest {
 
         when(teacherRepository.findAll()).thenReturn(teachers);
 
+        // When
         List<Teacher> foundTeachers = teacherService.findAll();
 
+        // Then
         assertNotNull(foundTeachers);
         assertEquals(2, foundTeachers.size());
-
         verify(teacherRepository, times(1)).findAll();
     }
 
     @Test
     public void testFindTeacherById_ExistingId() {
+        // Given
         Long id = 1L;
         Teacher teacher = new Teacher();
         teacher.setFirstName("John");
@@ -61,24 +64,26 @@ public class TeacherServiceTest {
 
         when(teacherRepository.findById(id)).thenReturn(Optional.of(teacher));
 
+        // When
         Teacher foundTeacher = teacherService.findById(id);
 
+        // Then
         assertNotNull(foundTeacher);
         assertEquals(teacher, foundTeacher);
-
         verify(teacherRepository, times(1)).findById(id);
     }
 
     @Test
     public void testFindTeacherById_NonExistingId() {
+        // Given
         Long id = 999L;
-
         when(teacherRepository.findById(id)).thenReturn(Optional.empty());
 
+        // When
         Teacher foundTeacher = teacherService.findById(id);
 
+        // Then
         assertNull(foundTeacher);
-
         verify(teacherRepository, times(1)).findById(id);
     }
 }

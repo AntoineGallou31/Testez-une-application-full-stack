@@ -122,17 +122,15 @@ describe ('Create Component spec', () => {
     cy.get('button[type=submit]').click();
 
     // Then
-
     cy.url().should('include', '/sessions');
-
     cy.wait('@createSession');
-
     cy.contains('Nouvelle Session').should('be.visible');
   });
 
   it('should display error when required field is missing', () => {
     cy.get('input[formControlName=name]').clear();
 
+    // Then
     cy.get('button[type=submit]').should('be.disabled');
   });
 });

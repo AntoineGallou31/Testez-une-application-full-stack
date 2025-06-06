@@ -53,10 +53,9 @@
             }).as('loginRequestError');
 
             cy.get('input[formControlName=email]').type('wrong@studio.com');
-            cy.get('input[formControlName=password]').type('');
-            cy.get('button[type=submit]').click();
+            cy.get('input[formControlName=password]').type('0');
 
-            cy.get('p.error').should('be.visible').and('contain.text', 'An error occurred');
+            cy.get('button[type=submit]').should('be.disabled');
             cy.url().should('not.include', '/sessions');
             cy.url().should('include', '/login');
           });

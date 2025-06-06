@@ -30,10 +30,12 @@ class AuthControllerTest {
 
     @Test
     void testAuthenticateUser() throws Exception {
+        // Given
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setEmail("test@example.com");
         loginRequest.setPassword("test!1234");
 
+        // When
         MvcResult result = mockMvc
                 .perform(
                         MockMvcRequestBuilders
@@ -43,6 +45,7 @@ class AuthControllerTest {
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
+        // Then
         String resultRequest = result.getResponse().getContentAsString();
         JwtResponse user = objectMapper.readValue(resultRequest, JwtResponse.class);
         assertEquals(loginRequest.getEmail(), user.getUsername());
@@ -50,12 +53,14 @@ class AuthControllerTest {
 
     @Test
     void testRegisterUser() throws Exception {
+        // Given
         SignupRequest signupRequest = new SignupRequest();
         signupRequest.setEmail("test1@example.com");
         signupRequest.setFirstName("John");
         signupRequest.setLastName("Doe");
         signupRequest.setPassword("password");
 
+        // When
         MvcResult result = mockMvc
                 .perform(
                         MockMvcRequestBuilders
@@ -69,12 +74,14 @@ class AuthControllerTest {
 
     @Test
     void testRegisterUser_EmailAlreadyExists() throws Exception {
+        // Given
         SignupRequest signupRequest = new SignupRequest();
         signupRequest.setEmail("test@example.com");
         signupRequest.setFirstName("John");
         signupRequest.setLastName("Doe");
         signupRequest.setPassword("password");
 
+        // When
         MvcResult result = mockMvc
                 .perform(
                         MockMvcRequestBuilders

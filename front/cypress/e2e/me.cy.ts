@@ -1,47 +1,108 @@
 /// <reference types="cypress" />
 
-describe('Me Component spec', () => {
+let user = {
+  id: '1',
+  firstName: 'John',
+  lastName: 'Doe',
+  email: 'johndoe@example.com',
+  admin: false,
+  createdAt: new Date(),
+  updatedAt: new Date()
+};
 
-  it('should go the the user information', () => {
+let admin = {
+  id: '2',
+  firstName: 'John',
+  lastName: 'Doe',
+  email: 'johndoe@example.com',
+  admin: true,
+  createdAt: new Date(),
+  updatedAt: new Date()
+};
 
-  cy.visit('/login');
+describe('MeComponent', () => {
+  beforeEach(() => {
+    cy.visit('/login');
 
-    cy.intercept('POST', '/api/auth/login', {
-      body: {
-        id: 1,
-        username: 'yoga@studio.com',
-        firstName: 'FirstName',
-        lastName: 'LastName',
-        admin: true,
-      },
-    }).as('loginRequest');
-
-    cy.intercept('GET', '/api/session', []).as('sessionsRequest');
     cy.intercept(
       {
         method: 'GET',
-        url: '/api/user/1',
+        url: '/api/session',
+
       },
-      {
-        id: 1,
-        email: 'yoga@studio.com',
-        lastName: 'Mar',
-        firstName: 'Ishta',
-        admin: true,
-        createdAt: '2023-10-12T15:49:37',
-        updatedAt: '2023-12-08T13:53:05',
-      }
-    ).as('me-details');
+      [
+        {
+          id: 1,
+          name: 'session1',
+          description: 'desc1',
+          date: new Date(),
+          teacher_id: 1,
+          users: [],
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 2,
+          name: 'session2',
+          description: 'desc2',
+          date: new Date(),
+          teacher_id: 2,
+          users: [],
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ]).as('session')
+  });
 
-    cy.get('input[formControlName=email]').type('yoga@studio.com');
-    cy.get('input[formControlName=password]').type('test!1234');
-    cy.get('button[type=submit]').click();
+  it('Should displays connected user information', () => {
+    cy.intercept('POST', '/api/auth/login', {
+      body: user
+    })
+    cy.intercept('GET', 'api/user/1', {
+      body: user
+    }).as('user');
 
-    cy.get('span[routerLink="me"]').click();
+    cy.get('input[formControlName=email]').type("yoga@studio.com")
+    cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`)
+    cy.get('span[routerLink=me]').click()
 
-    //Then
-    cy.get('p').contains('MAR');
-    cy.get('p').contains('yoga@studio');
+    cy.get('h1').should('contain', 'User information');
+
+    cy.get('p').should('contain', `Name: ${user.firstName} ${user.lastName.toUpperCase()}`);
+    cy.get('p').should('contain', `Email: ${user.email}`);
+    cy.get('p').should('contain', 'Create at');
+    cy.get('p').should('contain', 'Last update');
+  });
+
+  it('Shows "Delete my account" button if user is not admin', () => {
+    cy.intercept('POST', '/api/auth/login', {
+      body: user
+    })
+    cy.intercept('GET', 'api/user/1', {
+      body: user
+    }).as('user');
+
+    cy.get('input[formControlName=email]').type("yoga@studio.com")
+    cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`)
+    cy.get('span[routerLink=me]').click()
+
+    cy.contains('Delete my account').should('be.visible');
+  });
+
+
+  it('Does not show "Delete my account" button if user is admin', () => {
+    cy.intercept('POST', '/api/auth/login', {
+      body: admin
+    })
+    cy.intercept('GET', 'api/user/2', {
+      body: admin
+    }).as('user');
+
+    cy.get('input[formControlName=email]').type("yoga@studio.com")
+    cy.get('input[formControlName=password]').type(`${"test!1234"}{enter}{enter}`)
+    cy.get('span[routerLink=me]').click()
+
+    cy.contains('Delete my account').should('not.exist');
   });
 
 });

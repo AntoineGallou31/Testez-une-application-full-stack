@@ -28,39 +28,44 @@ public class UserServiceTest {
 
     @Test
     public void testDeleteUser() {
+        // Given
         Long id = 1L;
 
+        // When
         userService.delete(id);
 
+        // Then
         verify(userRepository, times(1)).deleteById(id);
     }
 
     @Test
     public void testFindUserById_ExistingId() {
+        // Given
         Long id = 1L;
         User user = new User();
         user.setId(id);
-
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
 
+        // When
         User foundUser = userService.findById(id);
 
+        // Then
         assertNotNull(foundUser);
         assertEquals(user, foundUser);
-
         verify(userRepository, times(1)).findById(id);
     }
 
     @Test
     public void testFindUserById_NonExistingId() {
+        // Given
         Long id = 999L;
-
         when(userRepository.findById(id)).thenReturn(Optional.empty());
 
+        // When
         User foundUser = userService.findById(id);
 
+        // Then
         assertNull(foundUser);
-
         verify(userRepository, times(1)).findById(id);
     }
 }

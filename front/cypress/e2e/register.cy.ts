@@ -38,4 +38,36 @@ describe('Register spec', () => {
     cy.url().should('not.include', '/login');
     cy.url().should('include', '/register');
   });
+
+  it('Should show submit button be disabled if a field if missing', () => {
+    cy.visit('/register');
+    cy.get('input[formControlName=firstName]').clear();
+
+    cy.contains('Last name *');
+
+    cy.get('button[type="submit"]').should('be.disabled');
+  });
+
+  it('Should show a error if email already exist', () => {
+    cy.visit('/register');
+
+    cy.intercept('POST', '/api/auth/register', {
+      statusCode: 400,
+      body: {
+        error: 'Error: Email is already taken!'
+      },
+    }).as('registerRequest');
+
+    cy.get('input[formControlName=firstName]').type('John');
+    cy.get('input[formControlName=lastName]').type('Doe');
+    cy.get('input[formControlName=email]').type('existing@example.com');
+    cy.get('input[formControlName=password]').type('password123');
+
+    cy.get('button[type="submit"]').click();
+
+    cy.wait('@registerRequest');
+
+    cy.contains('An error occurred');
+
+  });
 });

@@ -1,4 +1,3 @@
-
 package com.openclassrooms.starterjwt.controllers;
 
 import com.openclassrooms.starterjwt.dto.SessionDto;
@@ -46,18 +45,28 @@ public class SessionControllerTest {
         sessionDto.setUsers(new ArrayList<Long>(Arrays.asList(1L, 2L)));
     }
 
-
     @Test
     public void testFindById() throws Exception {
-        mockMvc.perform(get("/api/session/1"))
+        // Given
+        Long sessionId = 1L;
+
+        // When
+        mockMvc.perform(get("/api/session/" + sessionId))
+
+        // Then
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.id").value(sessionId));
     }
 
     @Test
     public void testFindAll() throws Exception {
+        // Given
+
+        // When
         mockMvc.perform(get("/api/session"))
+
+        // Then
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
@@ -67,13 +76,17 @@ public class SessionControllerTest {
 
     @Test
     public void testCreate() throws Exception {
-        mockMvc
-                .perform(
-                        MockMvcRequestBuilders
-                                .post("/api/session")
-                                .content(asJsonString(sessionDto))
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
+        // Given
+
+        // When
+        mockMvc.perform(
+                MockMvcRequestBuilders
+                        .post("/api/session")
+                        .content(asJsonString(sessionDto))
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+
+        // Then
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(
                         MockMvcResultMatchers.jsonPath("$.id").value(sessionDto.getId())
@@ -82,29 +95,47 @@ public class SessionControllerTest {
 
     @Test
     public void testUpdate() throws Exception {
-        mockMvc
-                .perform(
-                        MockMvcRequestBuilders
-                                .put("/api/session/1")
-                                .content(asJsonString(sessionDto))
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
+        // Given
+        Long sessionId = 1L;
+
+        // When
+        mockMvc.perform(
+                MockMvcRequestBuilders
+                        .put("/api/session/" + sessionId)
+                        .content(asJsonString(sessionDto))
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+
+        // Then
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(
                         MockMvcResultMatchers.jsonPath("$.id").value(sessionDto.getId())
                 );
     }
 
-
     @Test
     public void testParticipate() throws Exception {
-        mockMvc.perform(post("/api/session/1/participate/2"))
+        // Given
+        Long sessionId = 1L;
+        Long userId = 2L;
+
+        // When
+        mockMvc.perform(post("/api/session/" + sessionId + "/participate/" + userId))
+
+        // Then
                 .andExpect(status().isOk());
     }
 
     @Test
     public void testNoLongerParticipate() throws Exception {
-        mockMvc.perform(delete("/api/session/1/participate/1"))
+        // Given
+        Long sessionId = 1L;
+        Long userId = 1L;
+
+        // When
+        mockMvc.perform(delete("/api/session/" + sessionId + "/participate/" + userId))
+
+        // Then
                 .andExpect(status().isOk());
     }
 }
